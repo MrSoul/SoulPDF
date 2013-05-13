@@ -15,7 +15,7 @@
 #include "SplashOutputDev.h"
 #include "config.h"
 #include "QWheelEvent"
-#include "QGraphicsItem"
+#include <QGraphicsItem>
 #include <QtAlgorithms>
 #include "scrollarea.h"
 #include "graphicspixmapitem.h"
