@@ -69,12 +69,12 @@ PdfViewer::PdfViewer()
     createMenus();
     createToolbars();
     createStatusBar();
-    setWindowTitle(tr("MyXPDF Viewer"));
+    setWindowTitle(tr("SoulPDF Viewer"));
     resize(600, 500);
 }
 PdfViewer::~PdfViewer()
 {
-closeDocument();
+//closeDocument();
 }
 void PdfViewer::closeDocument()
 {
@@ -84,8 +84,8 @@ void PdfViewer::closeDocument()
     m_currentPage=1;
     m_pageCount=0;
     disableActs();
-    //delete ownerPW;
-    //delete userPW;
+    delete ownerPW;
+    delete userPW;
     if(m_doc!=0)m_doc->~PDFDoc();
     // delete m_imgLabel;
 }
@@ -94,7 +94,7 @@ void PdfViewer::openFile(const QString &path)
     QString fileName;
     if (path.isNull())
         fileName = QFileDialog::getOpenFileName(this, tr("Open PDF File"),
-                m_currentPath, "PDF files (*.pdf )");
+        m_currentPath, "PDF files (*.pdf )");
     else
         fileName = path;
 
@@ -104,8 +104,7 @@ void PdfViewer::openFile(const QString &path)
         if (!file.exists()) {
             QMessageBox::critical(this, tr("Open PDF File"),
                            QString("Could not open file '%1'.").arg(fileName));
-            }
-
+                            }
         loadDocument(fileName);
         m_imgLabel->setPixmap(QPixmap::fromImage(renderPage(m_currentPage)));
         populateScene();
@@ -114,12 +113,10 @@ void PdfViewer::openFile(const QString &path)
         updateActions();
         if (!fitToWindowAct->isChecked())
             m_imgLabel->adjustSize();
-        setWindowTitle(fileName + " - MyXPDF");
+        setWindowTitle(fileName + " - SoulPDF");
 
        return;
-    }
-
-
+                                }
 
 }
 void PdfViewer::loadDocument(const QString &fileName)
@@ -431,5 +428,4 @@ prevPageAct->setEnabled(false);
 nextPageAct->setEnabled(false);
 m_zoomComboBox->setEnabled(false);
 m_pageSpinBox->setEnabled(false);
-
 }
