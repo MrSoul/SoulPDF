@@ -9,6 +9,7 @@ PdfViewer::PdfViewer()
     ,m_doc(0)
     ,userPW(0)
     ,ownerPW(0)
+
 {
 // SplashDev init
     globalParams = new GlobalParams("");
@@ -72,23 +73,27 @@ PdfViewer::PdfViewer()
     setWindowTitle(tr("SoulPDF Viewer"));
     resize(600, 500);
 }
+
 PdfViewer::~PdfViewer()
 {
-//closeDocument();
 }
+
 void PdfViewer::closeDocument()
 {
-   // qDeleteAll( m_scene->items() );
-    m_scene->clear();
-    m_imgLabel->clear();
-    m_currentPage=1;
-    m_pageCount=0;
-    disableActs();
-    delete ownerPW;
-    delete userPW;
-    if(m_doc!=0)m_doc->~PDFDoc();
-    // delete m_imgLabel;
+    if(m_doc!=0)
+    {
+        m_scene->clear();
+        m_imgLabel->clear();
+        m_currentPage=1;
+        m_pageCount=0;
+        disableActs();
+        delete ownerPW;
+        delete userPW;
+        delete m_doc;
+        m_doc=NULL;
+    }
 }
+
 void PdfViewer::openFile(const QString &path)
 {
     QString fileName;
@@ -119,6 +124,7 @@ void PdfViewer::openFile(const QString &path)
                                 }
 
 }
+
 void PdfViewer::loadDocument(const QString &fileName)
 {
     ownerPW = new GString;
@@ -130,6 +136,7 @@ void PdfViewer::loadDocument(const QString &fileName)
     m_scrollArea->setDocLoaded(true);
     // дальше должна идти разблокировка менюшек
 }
+
 void PdfViewer::createActions()
 {
     openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
@@ -178,6 +185,7 @@ void PdfViewer::createActions()
     prevPageAct->setEnabled(false);
     connect(prevPageAct,SIGNAL(triggered()),this,SLOT(prevPage()));
 }
+
 void PdfViewer::createMenus()
 {
     fileMenu = new QMenu(tr("&File"), this);
@@ -191,8 +199,10 @@ void PdfViewer::createMenus()
 
     menuBar()->addMenu(fileMenu);
     menuBar()->addMenu(viewMenu);
-    }
-void PdfViewer::createToolbars(){
+}
+
+void PdfViewer::createToolbars()
+{
     fileToolBar = addToolBar(tr("File"));
     fileToolBar->addAction(openAct);
     fileToolBar->addAction(closeAct);
@@ -206,12 +216,13 @@ void PdfViewer::createToolbars(){
     NavigateToolBar->addAction(zoomInAct);
     NavigateToolBar->addWidget(m_zoomComboBox);
     NavigateToolBar->addAction(zoomOutAct);
-
 }
+
 void PdfViewer::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
 }
+
 QImage PdfViewer::renderPage(int pageNumber)
 {
 
@@ -243,17 +254,21 @@ QImage PdfViewer::renderPage(int pageNumber)
 */
              return img;
 }
+
 void PdfViewer::zoomIn()
 {
 int temp =  m_zoomComboBox->currentIndex();
     if (temp<8 && temp>=0)
         m_zoomComboBox->setCurrentIndex(temp+1);
 }
+
 void PdfViewer::zoomOut()
-{int temp =  m_zoomComboBox->currentIndex();
+{
+    int temp =  m_zoomComboBox->currentIndex();
     if (temp<=8 && temp>0)
     m_zoomComboBox->setCurrentIndex(temp-1);
 }
+
 void PdfViewer::scaleImage(double factor)
 {
     if(m_imgLabel->pixmap()) {
@@ -265,11 +280,13 @@ void PdfViewer::scaleImage(double factor)
     adjustScrollBar(m_scrollArea->verticalScrollBar(), factor);
     };
 }
+
 void PdfViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
     scrollBar->setValue(int(factor * scrollBar->value()
                             + ((factor - 1) * scrollBar->pageStep()/2)));
 }
+
 void PdfViewer::updateActions()
 {
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
@@ -282,6 +299,7 @@ void PdfViewer::updateActions()
  //   normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
 
 }
+
 void PdfViewer::fitToWindow()
 {
     bool fitToWindow = fitToWindowAct->isChecked();
@@ -291,11 +309,13 @@ void PdfViewer::fitToWindow()
     }
     updateActions();
 }
+
 void PdfViewer::normalSize()
 {
     m_imgLabel->adjustSize();
     scaleFactor = 1.0;
 }
+
 void PdfViewer::createComboBoxes()
 {
     m_zoomComboBox = new QComboBox;
@@ -316,6 +336,7 @@ void PdfViewer::createComboBoxes()
     m_pageSpinBox = new QSpinBox;
     m_pageSpinBox->setDisabled(true);
 }
+
 void PdfViewer::zoomComboBoxChanged(int cbindex)
 {
     double temp =scaleFactor;
@@ -359,6 +380,7 @@ void PdfViewer::zoomComboBoxChanged(int cbindex)
 
     };
 }
+
 void PdfViewer::nextPage()
 {
     if(m_currentPage<m_pageCount)
@@ -367,6 +389,7 @@ void PdfViewer::nextPage()
         m_pageSpinBox->setValue(m_currentPage+1);
     };
 }
+
 void PdfViewer::prevPage()
 {
     if(m_currentPage>1)
@@ -375,6 +398,7 @@ void PdfViewer::prevPage()
         m_pageSpinBox->setValue(m_currentPage-1);
     };
 }
+
 void PdfViewer::renderCurrentPage()
 {
     m_imgLabel->setPixmap(QPixmap::fromImage(renderPage(m_currentPage)));
@@ -384,6 +408,7 @@ void PdfViewer::renderCurrentPage()
     nextPageAct->setEnabled(m_currentPage<m_pageCount);
 
 }
+
 void PdfViewer::setCurrentPage(int page)
 {
     if(page!=m_currentPage)
@@ -391,6 +416,7 @@ void PdfViewer::setCurrentPage(int page)
     renderCurrentPage();
     };
 }
+
 void PdfViewer::populateScene()
 {
     scaleFactor=0.2;
@@ -412,6 +438,7 @@ void PdfViewer::populateScene()
     scaleFactor=1.0;
     connect(m_scene,SIGNAL(selectionChanged()),this,SLOT(thumbnailSelected()));
 }
+
 void PdfViewer::thumbnailSelected()
 {
     if(!(m_scene->selectedItems()).isEmpty()){
@@ -420,6 +447,7 @@ void PdfViewer::thumbnailSelected()
     };
 
 }
+
 void PdfViewer::disableActs()
 {
 zoomInAct->setEnabled(false);
